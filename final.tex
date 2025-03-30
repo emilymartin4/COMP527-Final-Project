@@ -66,16 +66,17 @@
     \item[\done] Extend Definition 2 Compatible relation to pairs.
     \item[\done] Prove Lemma 6 (Substitutivity of the Howe Relation) holds for our extension
     \item Prove Theorem 3 (Howe's Relation Coincide with Similarity, \(\Gamma\vdash p\howe q\iff \Gamma\vdash p\osim q\)). Achieved by first proving the lemmata presented below, then concluding the theorem. \begin{checklist}
-        \item Semi-transitivity
-        \item Reflexive
-        \item Compatibility
+        \item[\done] Semi-transitivity; \((m\osim m')\wedge(m'howe m'')\implies m\howe m''\)
+        \item[\done] Reflexive
+        \item Compatibility; extension of definition 2 holds
         \item Open similarity is contained in Howe
-        \item Howe relation is substitutive
+        \item[\done] Howe relation is substitutive
         \item Howe relation mimics the Simulation condition, extend for pairs. If \(\left\langle m_1,m_2 \right\rangle \howe[\tau\times\tau'] n\) then \(n\Downarrow \left\langle p_1,p_2 \right\rangle \) with \(m_1\howe p_1\) and \(m_2\howe[\tau'] p_2\)
         \item Downward closure, \((p\howe q)\wedge (p\Downarrow v)\implies v\howe q\)
         \item \(p\howe q \implies p\asim q\)
     \end{checklist}
 \end{checklist}
+For proofs where \(\text{fst},\text{snd}\) are similar, we use \(\text{fst}\) as the representative case.
 
 \paragraph{Definition 1. Applicative Simulation} We extend to pairs by adding the following, \begin{itemize}
     \item If \(m ~\mathcal{R}_{\tau\times\tau'}~n\) then \(m\Downarrow \left\langle m_f,m_s \right\rangle \) entails there are terms \(m_f',m_s'\) s.t. \(n\Downarrow \left\langle m_f',m_s' \right\rangle \) for which \(m_f ~\mathcal{R}_{\tau}~m_f'\) and \(m_s ~\mathcal{R}_{\tau'}~m_s'\)
@@ -84,7 +85,7 @@
 \paragraph{Theorem 1. Reflexitivity of Applicative Similarity} We show \(\forall m:\tau,m\asim m\) holds with our extension of applicative simulation by adding a case for pairs. We note \(S_{\tau}\) to be the family \(\left\{ (m,m) : \dot\vdash m:\tau \right\} \). Assume \(m~\mathcal{S}_{\tau\times\tau'}~m\) and \(m\Downarrow \left\langle m_f,m_s \right\rangle \). Pick \(m_f',m_s'\) to be \(m_f,m_s\). By definition of simulation, \(m_f~\mathcal{S}_{\tau}~m_f\) and \(m_s~\mathcal{S}_{\tau'}~m_s\) \hfill \(\square\)
 
 \paragraph{Definition 2. Compatible relation} We extend the definition of a compatible relation with the following, \begin{itemize}
-    \item[(C7)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau}~m_2\) and \(\vdash n_1~\mathcal{R}_{\tau'}~n_2\) entails \(\Gamma\vdash \left\langle m_1,n_1 \right\rangle ~\mathcal{R}_{\tau\times\tau'}~\left\langle m_2,n_2 \right\rangle \)
+    \item[(C7)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau}~m_2\) and \(\Gamma\vdash n_1~\mathcal{R}_{\tau'}~n_2\) entails \(\Gamma\vdash \left\langle m_1,n_1 \right\rangle ~\mathcal{R}_{\tau\times\tau'}~\left\langle m_2,n_2 \right\rangle \)
     \item[(C8)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau\times\tau'}~m_2\) entails \(\Gamma\vdash \text{fst}(m_1)~\mathcal{R}_{\tau}~\text{fst}(m_2)\)
     \item[(C9)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau\times\tau'}~m_2\) entails \(\Gamma\vdash \text{snd}(m_1)~\mathcal{R}_{\tau'}~\text{snd}(m_2)\)
 \end{itemize}
@@ -145,7 +146,73 @@ By the conclusion of the constructed derivation, \(\Psi \vdash [\sigma_1]\left\l
     \Psi&\vdash\text{fst}([\sigma_2]m')\osim{} [\sigma_2]n&\text{By Substitution }(\text{denote as }\mathcal{F}_2)\\
     \Psi&\vdash\text{fst}([\sigma_1]m)\howe{} [\sigma_2]n&\text{By hfst on } \mathcal{F}_1,\mathcal{F}_2\\
     \Psi&\vdash[\sigma_1]\text{fst}(m)\howe{} [\sigma_2]n&\text{By Substitution }
+\end{align*} \hfill \(\square\)
+
+
+\section*{Theorem 3}
+
+\paragraph{Lemmata 1} Semi-transitivity of Howe's relation. \((m\howe n')\wedge(n'\osim m'')\implies m\howe m''\)
+
+We define \(m=\left\langle m_1,m_2 \right\rangle, n=\left\langle n_1,n_2 \right\rangle, n'=\left\langle n_1',n_2' \right\rangle \).
+
+\textbf{Case.} With assumption \(n'\osimp m''\) \begin{center}
+    \(\mathcal{D}=\) \AxiomC{\(\mathcal{D}_1\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash m_1\howe n_1\)}
+    \AxiomC{\(\mathcal{D}_2\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash m_2\howe[\tau'] n_2\)}
+    \AxiomC{\(\mathcal{D}_3\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash \left\langle n_1, n_2 \right\rangle \osim[\tau\times\tau'] n' \)}
+    \RightLabel{\(\text{hpair}\)}\TrinaryInfC{\(\Gamma\vdash \left\langle m_1,m_2 \right\rangle \howep n'\)}
+    \DisplayProof
+\end{center} \begin{align*}
+    n&\osimp m''&&\text{By Transitivity of }\osimp~\text{on }\mathcal{D}_3~\text{and Assumption}\\
+    \Gamma\vdash \left\langle m_1,m_2 \right\rangle &\howep m''&&\text{By hpair on } \mathcal{D}_1,\mathcal{D}_2,~\text{and above}
 \end{align*}
 
+\textbf{Case.} With assumption \(\text{fst}(n')\osimp \text{fst}(m'')\) \begin{center}
+    \(\mathcal{D}=\) \AxiomC{\(\mathcal{D}_1\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash m\howep n\)}
+    \AxiomC{\(\mathcal{D}_2\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash \text{fst}(n)\osim \text{fst}(n')\)}
+    \RightLabel{\(\text{hfst}\)}\BinaryInfC{\(\Gamma\vdash \text{fst}(m)\howe \text{fst}(n')\)}
+    \DisplayProof
+\end{center} \begin{align*}
+    % \text{fst}(n')&\osim \text{fst}(m'')&&\text{By (C8) on Assumption}\\
+    \text{fst}(n)&\osim \text{fst}(m'')&&\text{By Transitivity of }\osim~\text{on }\mathcal{D}_2~\text{and assumption}\\
+    \Gamma\vdash \text{fst}(m)&\howe \text{fst}(m'')&&\text{By hfst on } \mathcal{D}_1~\text{and above}
+\end{align*} \hfill \(\square\)
+
+\paragraph{Lemmata 2} Reflexivity of Howe's relation. If \(\Gamma\vdash m:\tau\) then \(\Gamma\vdash m\howe m\). Proof by induction on typing,
+
+\textbf{Case.} \begin{center}
+    \(\mathcal{D}=\) \AxiomC{\(\mathcal{D}_1\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash M_1:\sigma\)}
+    \AxiomC{\(\mathcal{D}_2\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash M_2:\sigma'\)}
+    \RightLabel{\(\vdash\text{pair}\)}\BinaryInfC{\(\Gamma\vdash \left\langle M_1,M_2 \right\rangle :\sigma\times\sigma'\)}
+    \DisplayProof
+\end{center} \begin{align*}
+    \Gamma&\vdash M_1\howe[\sigma] M_1 &\text{By IH on } \mathcal{D}_1~(\text{denote as }\mathcal{F}_1)\\
+    \Gamma&\vdash M_2\howe[\sigma] M_2 &\text{By IH on } \mathcal{D}_2~(\text{denote as }\mathcal{F}_2)\\
+    \Gamma&\vdash \left\langle M_1,M_2 \right\rangle \osim[\sigma\times\sigma'] \left\langle M_1,M_2 \right\rangle&\text{By reflexivity of }\osim[\sigma\times\sigma']~(\text{denote as } \mathcal{F}_3) \\
+    \Gamma&\vdash \left\langle M_1,M_2 \right\rangle \howe[\sigma\times\sigma'] \left\langle M_1,M_2 \right\rangle&\text{By hpair on } \mathcal{F}_1,\mathcal{F}_2,\mathcal{F}_3
+\end{align*}
+
+\textbf{Case.} \begin{center}
+    \(\mathcal{D}=\) \AxiomC{\(\mathcal{D}_1\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash P:\sigma\times\sigma'\)}
+    \RightLabel{\(\vdash\text{fst}\)}\UnaryInfC{\(\Gamma\vdash \text{fst}(P):\sigma\)}
+    \DisplayProof
+\end{center} \begin{align*}
+    \Gamma&\vdash P\howe[\sigma\times\sigma'] P&\text{By IH on } \mathcal{D}_1~(\text{denote as } \mathcal{F}_1)\\
+    \Gamma&\vdash \text{fst}(P)\osim[\sigma]\text{fst}(P)&\text{By reflexivity of }\osim[\sigma]~(\text{denote as } \mathcal{F}_2)\\
+    \Gamma&\vdash \text{fst}(P)\howe[\sigma]\text{fst}(P)&\text{By hfst on } \mathcal{F}_1,\mathcal{F}_2
+\end{align*} \hfill \(\square\)
+
+\paragraph{Lemmata 3} Compatibility, (C7-C9) holds. \begin{itemize}
+    \item[C7]
+    \item[C8]
+    \item[C9]
+\end{itemize} \hfill \(\square\)
 
 \end{document}
