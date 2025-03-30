@@ -1,0 +1,183 @@
+
+%% Extend math functions
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
+
+%% Macros to support stacking objects vertically
+\usepackage{stackengine}
+
+%% Don't indent paragraphs, instead add more spacing between them
+\usepackage{parskip}
+
+\usepackage{mathdots}
+
+%% Graphical
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usetikzlibrary{automata, positioning, arrows, shapes}
+\tikzset{ %https://www3.nd.edu/~kogge/courses/cse30151-fa17/Public/other/tikz_tutorial.pdf
+    ->, % makes the edges directed
+    >=stealth, % makes the arrow heads bold
+    node distance=2cm, % specifies the minimum distance between two nodes. Change if necessary.
+    every state/.style={thick, fill=gray!10}, % sets the properties for each ’state’ node
+    initial text=\( \), % sets the text that appears on the start arrow
+}
+
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{xifthen}
+\usepackage{pdfpages}
+\usepackage{transparent}
+
+%% Cancel var commands
+\usepackage{cancel}
+
+%% Wrap text around figures and other graphics
+\usepackage{wrapfig}
+
+%% lorem ipsum generator
+\usepackage{lipsum}
+
+%% Caption controls
+\usepackage{caption}
+
+%% Prog-Code typeset
+\usepackage{listings}
+\lstset{
+    showstringspaces=false
+}
+
+%% Linked TOC
+\usepackage{hyperref}
+
+%% Get name instead of number of reference via \nameref{...}
+\usepackage{nameref}
+
+%% Table styling
+\usepackage{booktabs}
+
+%% For \FloatBarrier command
+\usepackage{placeins}
+
+%% Additional math symbols + theoretical computer science symbols
+\usepackage{stmaryrd}
+
+%% Proof trees
+\usepackage{bussproofs}
+\usepackage{bussproofs-extra}
+
+%>> -------------------- Redeclare math op --------------------  <<%%
+%% https://tex.stackexchange.com/questions/175251/how-to-redefine-a-command-using-declaremathoperator
+\makeatletter
+\newcommand\RedeclareMathOperator{%
+    \@ifstar{\def\rmo@s{m}\rmo@redeclare}{\def\rmo@s{o}\rmo@redeclare}%
+}
+% this is taken from \renew@command
+\newcommand\rmo@redeclare[2]{%
+    \begingroup \escapechar\m@ne\xdef\@gtempa{{\string#1}}\endgroup
+    \expandafter\@ifundefined\@gtempa
+        {\@latex@error{\noexpand#1undefined}\@ehc}%
+        \relax
+    \expandafter\rmo@declmathop\rmo@s{#1}{#2}}
+% This is just \@declmathop without \@ifdefinable
+\newcommand\rmo@declmathop[3]{%
+    \DeclareRobustCommand{#2}{\qopname\newmcodes@#1{#3}}%
+}
+\@onlypreamble\RedeclareMathOperator
+\makeatother
+\usepackage{titlesec}
+\titleformat*{\paragraph}{\normalfont\itshape}
+
+%%>> -------------------- Checklist --------------------  <<%%
+\usepackage{pifont}
+\usepackage{enumitem}
+\newlist{checklist}{itemize}{2}
+\setlist[checklist]{label=\(\square\)}
+\newcommand{\done}{\rlap{\(\square\)}{\raisebox{1.5pt}{\large\hspace{1pt}\ding{51}}}\hspace{-2.5pt}}
+
+%%>> -------------------- QOL Commands --------------------  <<%%
+
+\DeclareMathOperator\N{\mathbb{N}}
+\DeclareMathOperator\R{\mathbb{R}}
+\DeclareMathOperator\Z{\mathbb{Z}}
+\let\p\relax
+\RedeclareMathOperator\P{\mathbb{P}}
+\DeclareMathOperator\E{\mathbb{E}}
+\renewcommand\O{\emptyset}
+\DeclareMathOperator\Q{\mathbb{Q}}
+\DeclareMathOperator\C{\mathbb{C}}
+\DeclareMathOperator\infin{\infty}
+
+\DeclareMathOperator\sub{\subset}
+\DeclareMathOperator\sube{\subseteq}
+\DeclareMathOperator\nsube{\nsubseteq}
+\DeclareMathOperator\unif{\text{Unif}}
+
+\newcommand{\howe}[1][\tau]{\preccurlyeq_{#1}^{\mathcal{H}}}
+\newcommand{\osim}[1][\tau]{\preccurlyeq_{#1}^{\circ}}
+\newcommand{\asim}[1][\tau]{\preccurlyeq_{#1}}
+
+
+%% https://tex.stackexchange.com/questions/85059/proof-environment-line-break-after-the-proof
+\newcommand{\forceNewline}{\( \)\par\nobreak\ignorespaces}%
+
+%% https://tex.stackexchange.com/questions/50804/explicit-space-character
+\newcommand\visiblespace[1][.3em]{%
+    \mbox{\kern.06em\vrule height.3ex}%
+    \vbox{\hrule width#1}%
+    \hbox{\vrule height.3ex}%
+}
+\usepackage{geometry} % Required for adjusting page dimensions and margins
+\geometry{margin=2cm}
+
+%%>> -------------------- Theorem Environments --------------------  <<%%
+
+
+% \usepackage{thmtools}
+% \usepackage{thm-restate}
+% \usepackage[framemethod=TikZ]{mdframed}
+% \mdfsetup{skipabove=1em,skipbelow=0em, innertopmargin=12pt, innerbottommargin=8pt}
+
+% \theoremstyle{definition}
+
+% \declaretheoremstyle[headfont=\bfseries\sffamily, bodyfont=\normalfont, mdframed={ nobreak } ]{thmgreenbox}
+% \declaretheoremstyle[headfont=\bfseries\sffamily, bodyfont=\normalfont, mdframed={ nobreak } ]{thmredbox}
+% \declaretheoremstyle[headfont=\bfseries\sffamily, bodyfont=\normalfont]{thmbluebox}
+% \declaretheoremstyle[headfont=\bfseries\sffamily, bodyfont=\normalfont]{thmblueline}
+% \declaretheoremstyle[headfont=\bfseries\sffamily, bodyfont=\normalfont, numbered=no, mdframed={ rightline=false, topline=false, bottomline=false, }, qed=\qedsymbol ]{thmproofbox}
+% \declaretheoremstyle[headfont=\bfseries\sffamily, bodyfont=\normalfont, numbered=no, mdframed={ nobreak, rightline=false, topline=false, bottomline=false } ]{thmexplanationbox}
+
+
+% \declaretheorem[numbered=no, style=thmgreenbox, name=Definition]{definition}
+% \declaretheorem[numberwithin=chapter, style=thmredbox, name=Theorem]{theorem}
+% \declaretheorem[sibling=theorem, style=thmredbox, name=Corollary]{corollary}
+% \declaretheorem[sibling=theorem, style=thmredbox, name=Proposition]{prop}
+% \declaretheorem[sibling=theorem, style=thmredbox, name=Lemma]{lemma}
+% \declaretheorem[numberwithin=chapter, style=thmbluebox, name=Example]{example}
+% \declaretheorem[sibling=example, style=thmbluebox, name=Nonexample]{nonexample}
+% \declaretheorem[numbered=no, style=thmblueline, name=Remark]{remark}
+% \declaretheorem[numbered=no, style=thmredbox, name=Observation]{observation}
+% \declaretheorem[numbered=no, style=thmredbox, name=Postulate]{postulate}
+% \declaretheorem[sibling=theorem, style=thmredbox, name=Observation]{observationnum}
+% \declaretheorem[numbered=no, style=thmblueline, name=Axiom]{axiom}
+% \declaretheorem[numbered=no, style=thmblueline, name=Conjecture]{conjecture}
+% \declaretheorem[numbered=no, style=thmblueline, name=Notation]{notation}
+% \declaretheorem[style=thmbluebox,  numbered=no, name=Exercise]{exercise}
+
+%>> -------------------- Figures --------------------  <<%%
+
+%% For non-tuftebook styled sheets this is almost identical to \largeinkfig
+\newcommand{\inkfig}[2][1]{%
+    \def\svgwidth{#1\textwidth}%
+    \import{./figures}{#2.pdf_tex}%
+}
+
+\newcommand{\largeinkfig}[2][0.90]{%
+    \def\svgwidth{#1\paperwidth}%
+    \import{./figures}{#2.pdf_tex}%
+}
+
+
+\newcommand{\smallinkfig}[2][0.7]{%
+    \def\svgwidth{\columnwidth}
+    \resizebox{#1\textwidth}{!}{\import{./figures}{#2.pdf_tex}}
+}

@@ -1,0 +1,151 @@
+\documentclass{article}
+
+\input{preamble.tex}
+
+\title{W2025 - COMP527 Final}
+\author{L, Emily, Alex}
+\date{\today}
+
+\graphicspath{{./nifigures/}}
+
+\begin{document}
+\maketitle
+
+\paragraph{Rules of Inference} \begin{center}
+    \AxiomC{\(\Gamma\vdash M_1:\sigma\)}
+    \AxiomC{\(\Gamma\vdash M_2:\sigma'\)}
+    \RightLabel{\(\vdash~\text{pair}\)}\BinaryInfC{\(\Gamma\vdash \left\langle M_1,M_2 \right\rangle :\sigma\times\sigma'\)}
+    \DisplayProof
+\end{center}
+\begin{center}
+    \AxiomC{\(\Gamma\vdash P:\sigma\times\sigma'\)}
+    \RightLabel{\(\vdash~\text{fst}\)}\UnaryInfC{\(\Gamma\vdash~\text{fst}(P):\sigma\)}
+    \DisplayProof
+    \(\quad\)
+    \AxiomC{\(\Gamma\vdash P:\sigma\times\sigma'\)}
+    \RightLabel{\(\vdash~\text{snd}\)}\UnaryInfC{\(\Gamma\vdash~\text{snd}(P):\sigma'\)}
+    \DisplayProof
+\end{center}
+\begin{center}
+    \AxiomC{\(\Gamma\vdash P\Downarrow \left\langle M_1,M_2 \right\rangle \)}
+    \AxiomC{\(\Gamma\vdash M_1\Downarrow c\)}
+    \RightLabel{\(\Downarrow~\text{fst}\)}\BinaryInfC{\(\Gamma\vdash \text{fst}(P)\Downarrow c\)}
+    \DisplayProof
+    \(\quad\)
+    \AxiomC{\(\Gamma\vdash P\Downarrow \left\langle M_1,M_2 \right\rangle \)}
+    \AxiomC{\(\Gamma\vdash M_2\Downarrow c\)}
+    \RightLabel{\(\Downarrow~\text{snd}\)}\BinaryInfC{\(\Gamma\vdash \text{snd}(P)\Downarrow c\)}
+    \DisplayProof
+\end{center}
+
+\paragraph{Proposed Howe's Inference Rules} \begin{center}
+    \AxiomC{\(\Gamma\vdash m\howe[\tau\times\tau'] m'\)}
+    \AxiomC{\(\Gamma\vdash~\text{fst}~m'\osim n\)}
+    \RightLabel{\(\text{hfst}\)}\BinaryInfC{\(\Gamma\vdash~\text{fst}(m)\howe n\)}
+    \DisplayProof
+    \(\quad\)
+    \AxiomC{\(\Gamma\vdash m\howe[\tau\times\tau'] m'\)}
+    \AxiomC{\(\Gamma\vdash~\text{snd}~m'\osim[\tau'] n\)}
+    \RightLabel{\(\text{hsnd}\)}\BinaryInfC{\(\Gamma\vdash~\text{snd}(m)\howe[\tau'] n\)}
+    \DisplayProof
+\end{center}
+
+\begin{center}
+    \AxiomC{\(\Gamma\vdash m_1\howe m_1'\)}
+    \AxiomC{\(\Gamma\vdash m_2\howe[\tau'] m_2'\)}
+    \AxiomC{\(\Gamma\vdash \left\langle m_1',m_2' \right\rangle \osim[\tau\times\tau']n\)}
+    \RightLabel{\(\text{hpair}\)}\TrinaryInfC{\(\Gamma\vdash \left\langle m_1,m_2 \right\rangle \howe[\tau\times\tau'] n\)}
+    \DisplayProof
+\end{center}
+
+
+
+\paragraph{Objective} Prove the following theorems (from Howe's paper) on our extension. \begin{checklist}
+    \item[\done] Extend Definition 1 Applicative Simulation to pairs
+    \item[\done] Prove Theorem 1 (Reflexivity of Applicative Similarity, \(\forall m:\tau,m\asim m\)) holds for our extension
+    \item[\done] Extend Definition 2 Compatible relation to pairs.
+    \item[\done] Prove Lemma 6 (Substitutivity of the Howe Relation) holds for our extension
+    \item Prove Theorem 3 (Howe's Relation Coincide with Similarity, \(\Gamma\vdash p\howe q\iff \Gamma\vdash p\osim q\)). Achieved by first proving the lemmata presented below, then concluding the theorem. \begin{checklist}
+        \item Semi-transitivity
+        \item Reflexive
+        \item Compatibility
+        \item Open similarity is contained in Howe
+        \item Howe relation is substitutive
+        \item Howe relation mimics the Simulation condition, extend for pairs. If \(\left\langle m_1,m_2 \right\rangle \howe[\tau\times\tau'] n\) then \(n\Downarrow \left\langle p_1,p_2 \right\rangle \) with \(m_1\howe p_1\) and \(m_2\howe[\tau'] p_2\)
+        \item Downward closure, \((p\howe q)\wedge (p\Downarrow v)\implies v\howe q\)
+        \item \(p\howe q \implies p\asim q\)
+    \end{checklist}
+\end{checklist}
+
+\paragraph{Definition 1. Applicative Simulation} We extend to pairs by adding the following, \begin{itemize}
+    \item If \(m ~\mathcal{R}_{\tau\times\tau'}~n\) then \(m\Downarrow \left\langle m_f,m_s \right\rangle \) entails there are terms \(m_f',m_s'\) s.t. \(n\Downarrow \left\langle m_f',m_s' \right\rangle \) for which \(m_f ~\mathcal{R}_{\tau}~m_f'\) and \(m_s ~\mathcal{R}_{\tau'}~m_s'\)
+\end{itemize}
+
+\paragraph{Theorem 1. Reflexitivity of Applicative Similarity} We show \(\forall m:\tau,m\asim m\) holds with our extension of applicative simulation by adding a case for pairs. We note \(S_{\tau}\) to be the family \(\left\{ (m,m) : \dot\vdash m:\tau \right\} \). Assume \(m~\mathcal{S}_{\tau\times\tau'}~m\) and \(m\Downarrow \left\langle m_f,m_s \right\rangle \). Pick \(m_f',m_s'\) to be \(m_f,m_s\). By definition of simulation, \(m_f~\mathcal{S}_{\tau}~m_f\) and \(m_s~\mathcal{S}_{\tau'}~m_s\) \hfill \(\square\)
+
+\paragraph{Definition 2. Compatible relation} We extend the definition of a compatible relation with the following, \begin{itemize}
+    \item[(C7)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau}~m_2\) and \(\vdash n_1~\mathcal{R}_{\tau'}~n_2\) entails \(\Gamma\vdash \left\langle m_1,n_1 \right\rangle ~\mathcal{R}_{\tau\times\tau'}~\left\langle m_2,n_2 \right\rangle \)
+    \item[(C8)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau\times\tau'}~m_2\) entails \(\Gamma\vdash \text{fst}(m_1)~\mathcal{R}_{\tau}~\text{fst}(m_2)\)
+    \item[(C9)] \(\Gamma\vdash m_1~\mathcal{R}_{\tau\times\tau'}~m_2\) entails \(\Gamma\vdash \text{snd}(m_1)~\mathcal{R}_{\tau'}~\text{snd}(m_2)\)
+\end{itemize}
+
+
+\paragraph{Lemma 6. Substitutivity of the Howe Relation.} Suppose we have \(\Gamma\vdash m_1 \howe m_2 \text{ and } \Psi \vdash \sigma_1 \howe[\Gamma] \sigma_2; \text{ then } \Psi \vdash [\sigma_1]m_1 \howe{}
+[\sigma_2]m_2\). Proof by induction on the derivations of \( \Gamma \vdash m_1 \howe m_2\). We extend this to the derivations of the Howe relation for pairs.
+
+\textbf{Case}
+\begin{prooftree}
+    \AxiomC{\(\mathcal{D}_1\)}
+    \noLine
+    \UnaryInfC{\(\Gamma \vdash m_1 \howe m_1'\)}
+    \AxiomC{\(\mathcal{D}_2\)}
+    \noLine
+    \UnaryInfC{\(\Gamma \vdash m_2 \howe[\tau'] m_2'\)}
+    \AxiomC{\(\mathcal{D}_3\)}
+    \noLine
+    \UnaryInfC{\(\Gamma \vdash \left\langle m_1', m_2' \right\rangle  \osim[\tau \times \tau'] n\)}
+    \RightLabel{hpair}
+    \LeftLabel{\(\mathcal{D} = \)}
+    \TrinaryInfC{\(\Gamma \vdash  \left\langle m_1, m_2 \right\rangle  \howe[\tau \times \tau'] n\)}
+\end{prooftree}
+
+WTS: \(\Psi \vdash [\sigma_1] \left\langle m_1, m_2 \right\rangle  \howe[\tau \times \tau'] [\sigma_2]n\) \begin{align*}
+& \Psi \vdash [\sigma_1]m_1 \howe{} [\sigma_2]m_1' &\text{ by IH on } \mathcal{D}_1 \\
+& \Psi \vdash [\sigma_1]m_2 \howe{} [\sigma_2]m_2' &\text{ by IH on } \mathcal{D}_2 \\
+& \Psi \vdash [\sigma_2]\left\langle m_1', m_2' \right\rangle  \osim[\tau \times \tau'] [\sigma_2]n & \text{ by cus on } \mathcal{D}_3 &\\
+& [\sigma_2] \left\langle m_1', m_2' \right\rangle  \; = \; \left\langle [\sigma_2]m_1', [\sigma_2]m_2' \right\rangle  & \text{ by def. of substitution }&
+\end{align*}
+
+Construct: \begin{prooftree}
+    \AxiomC{}
+    \noLine
+    \UnaryInfC{\(\Psi \vdash [\sigma_1]m_1 \howe{} [\sigma_2]m_1'\)}
+    \AxiomC{}
+    \noLine
+    \UnaryInfC{\(\Psi \vdash [\sigma_1]m_2 \howe[\tau'] [\sigma_2]m_2'\)}
+    \AxiomC{}
+    \noLine
+    \UnaryInfC{\(\Psi \vdash \left\langle [\sigma_2] m_1', [\sigma_2]m_2' \right\rangle  \osim[\tau \times \tau'] [\sigma_2]n\)}
+    \RightLabel{hpair}
+    \TrinaryInfC{\(\Psi \vdash \left\langle [\sigma_1]m_1, [\sigma_1]m_2 \right\rangle  \howe[\tau \times \tau'] [\sigma_2]n\)}
+\end{prooftree}
+
+By the conclusion of the constructed derivation, \(\Psi \vdash [\sigma_1]\left\langle m_1, m_2 \right\rangle  \howe[\tau \times \tau'] [\sigma_2]n\).
+
+\textbf{Case} \begin{center}
+    \(\mathcal{D}=\) \AxiomC{\(\mathcal{D}_1\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash m\howe[\tau\times\tau']m'\)}
+    \AxiomC{\(\mathcal{D}_2\)}
+    \noLine\UnaryInfC{\(\Gamma\vdash \text{fst}(m')\osim n\)}
+    \RightLabel{\(\text{hfst}\)}\BinaryInfC{\(\Gamma\vdash \text{fst}(m)\howe n\)}
+    \DisplayProof
+\end{center} \begin{align*}
+    \Psi&\vdash[\sigma_1]m\howe[\tau\times\tau'] [\sigma_2]m'&\text{By IH on }\mathcal{D}_1~(\text{denote as }\mathcal{F}_1)\\
+    \Psi&\vdash[\sigma_2]\text{fst}(m')\osim{} [\sigma_2]n&\text{By (cus) on }\mathcal{D}_2\\
+    \Psi&\vdash\text{fst}([\sigma_2]m')\osim{} [\sigma_2]n&\text{By Substitution }(\text{denote as }\mathcal{F}_2)\\
+    \Psi&\vdash\text{fst}([\sigma_1]m)\howe{} [\sigma_2]n&\text{By hfst on } \mathcal{F}_1,\mathcal{F}_2\\
+    \Psi&\vdash[\sigma_1]\text{fst}(m)\howe{} [\sigma_2]n&\text{By Substitution }
+\end{align*}
+
+
+\end{document}
