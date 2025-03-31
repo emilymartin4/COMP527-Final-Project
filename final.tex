@@ -27,14 +27,14 @@
     \DisplayProof
 \end{center}
 \begin{center}
-    \AxiomC{\(\Gamma\vdash P\Downarrow \left\langle M_1,M_2 \right\rangle \)}
-    \AxiomC{\(\Gamma\vdash M_1\Downarrow c\)}
-    \RightLabel{\(\Downarrow~\text{fst}\)}\BinaryInfC{\(\Gamma\vdash \text{fst}(P)\Downarrow c\)}
+    \AxiomC{\(P\Downarrow \left\langle M_1,M_2 \right\rangle \)}
+    \AxiomC{\(M_1\Downarrow c\)}
+    \RightLabel{\(\Downarrow~\text{fst}\)}\BinaryInfC{\( \text{fst}(P)\Downarrow c\)}
     \DisplayProof
     \(\quad\)
-    \AxiomC{\(\Gamma\vdash P\Downarrow \left\langle M_1,M_2 \right\rangle \)}
-    \AxiomC{\(\Gamma\vdash M_2\Downarrow c\)}
-    \RightLabel{\(\Downarrow~\text{snd}\)}\BinaryInfC{\(\Gamma\vdash \text{snd}(P)\Downarrow c\)}
+    \AxiomC{\(P\Downarrow \left\langle M_1,M_2 \right\rangle \)}
+    \AxiomC{\( M_2\Downarrow c\)}
+    \RightLabel{\(\Downarrow~\text{snd}\)}\BinaryInfC{\(\text{snd}(P)\Downarrow c\)}
     \DisplayProof
 \end{center}
 
