@@ -65,12 +65,12 @@
     \item[\done] Prove Theorem 1 (Reflexivity of Applicative Similarity, \(\forall m:\tau,m\asim m\)) holds for our extension
     \item[\done] Extend Definition 2 Compatible relation to pairs.
     \item[\done] Prove Lemma 6 (Substitutivity of the Howe Relation) holds for our extension
-    \item Prove Theorem 3 (Howe's Relation Coincide with Similarity, \(\Gamma\vdash p\howe q\iff \Gamma\vdash p\osim q\)). Achieved by first proving the lemmata presented below, then concluding the theorem. \begin{checklist}
-        \item[\done] Semi-transitivity; \((m\osim m')\wedge(m'howe m'')\implies m\howe m''\)
-        \item[\done] Reflexive
-        \item Compatibility; extension of definition 2 holds
-        \item Open similarity is contained in Howe
-        \item[\done] Howe relation is substitutive
+    \item Prove Theorem 3 (Howe's Relation Coincide with Similarity, \(\Gamma\vdash p\howe q\iff \Gamma\vdash p\osim q\)). Achieved by first extending the lemmata proofs to pairs, then concluding the theorem. \begin{checklist}
+        \item[\done] Semi-transitivity; \((m\howe m')\wedge(m'\osim m'')\implies m\howe m''\)
+        \item[\done] Reflexive;
+        \item Compatibility; Our extension of definition 2 holds
+        \item Open similarity is contained in Howe; \(\Gamma\vdash m\osim n\implies\Gamma\vdash m\howe n\)
+        \item[\done] Howe relation is substitutive (immediate from lemma 6)
         \item Howe relation mimics the Simulation condition, extend for pairs. If \(\left\langle m_1,m_2 \right\rangle \howe[\tau\times\tau'] n\) then \(n\Downarrow \left\langle p_1,p_2 \right\rangle \) with \(m_1\howe p_1\) and \(m_2\howe[\tau'] p_2\)
         \item Downward closure, \((p\howe q)\wedge (p\Downarrow v)\implies v\howe q\)
         \item \(p\howe q \implies p\asim q\)
