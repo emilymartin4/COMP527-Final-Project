@@ -76,16 +76,18 @@ and inductive Ex_sim_pair : [ |- term S] -> [ |- term T] -> [|- term (cross S T)
               -> Ex_sim_pair [ |- H] [ |- L] [|- N]
 ;
 
-%{
+
 rec sim_refl : Sim [|- T] [|- M] [|- M] =
 / trust /
 fun .Sim_unit d => d
   | .Sim_nil d => d
   | .Sim_cons d => ESim_cons d sim_refl sim_refl
   | .Sim_lam d => ESim_lam d (mlam R => sim_refl)
+  | .Sim_pair d => ESim_pair d sim_refl sim_refl
+% THIS TYPECHECKS BUT DOESN'T SEEM CORRECT
 ;
 
-
+%{
 rec sim_trans : Sim [|- T] [|- M] [|- N] -> Sim [|- T] [|- N] [|- R]
                 -> Sim [|- T] [|- M] [|- R] =
 / trust /
