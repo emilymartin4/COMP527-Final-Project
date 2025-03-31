@@ -84,10 +84,9 @@ fun .Sim_unit d => d
   | .Sim_cons d => ESim_cons d sim_refl sim_refl
   | .Sim_lam d => ESim_lam d (mlam R => sim_refl)
   | .Sim_pair d => ESim_pair d sim_refl sim_refl
-% THIS TYPECHECKS BUT DOESN'T SEEM CORRECT
 ;
 
-%{
+
 rec sim_trans : Sim [|- T] [|- M] [|- N] -> Sim [|- T] [|- N] [|- R]
                 -> Sim [|- T] [|- M] [|- R] =
 / trust /
@@ -101,8 +100,13 @@ fun s1 s2 .Sim_unit d => s2 .Sim_unit (s1 .Sim_unit d)
     let ESim_lam d1 s1' = s1 .Sim_lam d in
     let ESim_lam d2 s2' = s2 .Sim_lam d1 in
     ESim_lam d2 (mlam P => sim_trans (s1' [|- P]) (s2' [|- P]))
+  | s1 s2 .Sim_pair d =>
+    let ESim_pair d1 s1' s1'' = s1 .Sim_pair d in
+    let ESim_pair d2 s2' s2'' = s2 .Sim_pair d1 in
+    ESim_pair d2 (sim_trans s1' s2') (sim_trans s1'' s2'')
 ;
 
+%{
 schema ctx = some [t:tp] term t;
 
 inductive OSim : (g:ctx) {T:[|- tp]} [g |- term T[]] -> [g |- term T[]] -> ctype =
