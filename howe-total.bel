@@ -18,8 +18,8 @@ LF term : tp -> type =
 | cons : term T -> term (list T) -> term (list T)
 | lcase : term (list S) -> term T -> (term S -> term (list S) -> term T) -> term T
 | pair : term S -> term T -> term (cross S T) 
-| fst : term (cross S T) -> term s
-| snd : term (cross S T) -> term t
+| fst : term (cross S T) -> term S
+| snd : term (cross S T) -> term T
 ;
 
 inductive Value : [ |- term T] -> ctype =
@@ -178,7 +178,7 @@ inductive Howe : (g:ctx) {T:[|- tp]} [g |- term T[]] -> [g |- term T[]] -> ctype
               -> Howe [ |- T] [g |- snd M] [g |- N]
 ;
 
-%{
+
 rec howe_osim_trans : (g:ctx) Howe [|- T] [g |- M] [g |- N]
                       -> OSim [|- T] [g |- N] [g |- R]
                       -> Howe [|- T] [g |- M] [g |- R] =
@@ -191,6 +191,9 @@ fun (Howe_unit s1) s2 => Howe_unit (osim_trans s1 s2)
   | (Howe_nil s1) s2 => Howe_nil (osim_trans s1 s2)
   | (Howe_cons h1 h2 s1) s2 => Howe_cons h1 h2 (osim_trans s1 s2)
   | (Howe_case h1 h2 h3 s1) s2 => Howe_case h1 h2 h3 (osim_trans s1 s2)
+  | (Howe_pair h1 h2 s1) s2 => Howe_pair h1 h2 (osim_trans s1 s2)
+  | (Howe_fst h1 s1) s2 => Howe_fst h1 (osim_trans s1 s2)
+  | (Howe_snd h1 s1) s2 => Howe_snd h1 (osim_trans s1 s2)
 ;
 
 
@@ -207,7 +210,11 @@ mlam M => case [_ |- M] of
   | [g |- lcase M N (\h.\t.P)] =>
     Howe_case (howe_refl [g |- M]) (howe_refl [g |- N]) (howe_refl [g, h:term _, t:term (list _) |- P])
               osim_refl
+  | [g |- pair M N] => Howe_pair (howe_refl [g |- M])  (howe_refl [g |- N]) osim_refl
+  | [g |- fst M] => Howe_fst (howe_refl [g |- M]) osim_refl
+  | [g |- snd M] => Howe_snd (howe_refl [g |- M]) osim_refl
 ;
+
 
 rec osim_howe : (g:ctx) OSim [|- T] [g |- M] [g |- N] -> Howe [|- T] [g |- M] [g |- N] =
 / total s (osim_howe g t m n s) /
@@ -219,19 +226,27 @@ rec sim_howe : Sim [|- T] [|- M] [|- N] -> Howe [|- T] [|- M] [|- N] =
     fun s => osim_howe (sim_osim s)
 ;
 
+
+
+%idk how to do this (or what is is)!!! -L
+%{
 inductive Howe_subst : {g:ctx} (h:ctx) {$S1 : $[h |- g]} {$S2 : $[h |- g]} ctype =
   | HNil : Howe_subst [] $[h |- ^] $[h |- ^]
   | HCons : Howe_subst [g] $[h |- $S1] $[h |- $S2]
             -> Howe [|- T] [h |- M] [h |- N]
             -> Howe_subst [g, x:term T[]] $[h |- $S1, M] $[h |- $S2, N]
+  | HPair : 
 ;
+}%
 
+
+%{
 rec howe_subst_refl : {g:ctx} (h:ctx) {$S:$[h |- g]} Howe_subst [g] $[h |- $S] $[h |- $S] =
 / trust /
 fun [] $[h |- ^] => HNil
   | [g, x:term _] $[h |- $S', M] => HCons (howe_subst_refl [g] $[h |- $S']) (howe_refl [h |- M])
 ;
-
+%{
 rec howe_ren : {g:ctx}{h:ctx}{$S: $[h |-# g]} Howe [|- T] [g |- M] [g |- N]
                -> Howe [|- T] [h |- M[$S]] [h |- N[$S]] =
 / total hr (howe_ren g h s t m n hr) /
@@ -250,7 +265,7 @@ mlam g, h, $S => fn hr => case hr of
                                     (osim_cus $[h |- $S] s)
 ;
 
-
+%{
 rec howe_subst_wkn : (g:ctx) (h:ctx) {S:[|-tp]} Howe_subst [g] $[h |- $S1] $[h |- $S2]
                     -> Howe_subst [g] $[h, x:term S[] |- $S1[..]] $[h, x:term S[] |- $S2[..]] =
 / total hr (howe_subst_wkn g h s s1 s2 hr) /
