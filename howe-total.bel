@@ -106,7 +106,7 @@ fun s1 s2 .Sim_unit d => s2 .Sim_unit (s1 .Sim_unit d)
     ESim_pair d2 (sim_trans s1' s2') (sim_trans s1'' s2'')
 ;
 
-%{
+
 schema ctx = some [t:tp] term t;
 
 inductive OSim : (g:ctx) {T:[|- tp]} [g |- term T[]] -> [g |- term T[]] -> ctype =
@@ -165,9 +165,20 @@ inductive Howe : (g:ctx) {T:[|- tp]} [g |- term T[]] -> [g |- term T[]] -> ctype
                                [g, h:term T[], t:term (list T[]) |- P']
                -> OSim [|- T'] [g |- lcase M' N' \h.\t.P'] [g |- R]
                -> Howe [|- T'] [g |- lcase M N \h.\t.P] [g |- R]
+  | Howe_pair : Howe [ |- S] [g |- M1] [g |- M1']
+              -> Howe [ |- T] [g |- M2] [g |- M2']
+              -> OSim [ |- cross S T ] [g |- pair M1' M2'] [g |- N]
+              -> Howe [ |- cross S T ] [g |- pair M1 M2] [g |- N]
+
+  | Howe_fst : Howe [ |- cross S T ] [g |- M] [g |- M']
+              -> OSim [ |- S] [g |- fst M'] [g |- N]
+              -> Howe [ |- S] [g |- fst M] [g |- N]
+  | Howe_snd : Howe [ |- cross S T ] [g |- M] [g |- M']
+              -> OSim [ |- T] [g |- snd M'] [g |- N]
+              -> Howe [ |- T] [g |- snd M] [g |- N]
 ;
 
-
+%{
 rec howe_osim_trans : (g:ctx) Howe [|- T] [g |- M] [g |- N]
                       -> OSim [|- T] [g |- N] [g |- R]
                       -> Howe [|- T] [g |- M] [g |- R] =
