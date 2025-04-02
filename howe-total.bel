@@ -228,25 +228,21 @@ rec sim_howe : Sim [|- T] [|- M] [|- N] -> Howe [|- T] [|- M] [|- N] =
 
 
 
-%idk how to do this (or what is is)!!! -L
-%{
+%this is on the context, so obviously it doesn't get changed with our extension to pairs
 inductive Howe_subst : {g:ctx} (h:ctx) {$S1 : $[h |- g]} {$S2 : $[h |- g]} ctype =
   | HNil : Howe_subst [] $[h |- ^] $[h |- ^]
   | HCons : Howe_subst [g] $[h |- $S1] $[h |- $S2]
             -> Howe [|- T] [h |- M] [h |- N]
-            -> Howe_subst [g, x:term T[]] $[h |- $S1, M] $[h |- $S2, N]
-  | HPair : 
+            -> Howe_subst [g, x:term T[]] $[h |- $S1, M] $[h |- $S2, N] 
 ;
-}%
 
-
-%{
 rec howe_subst_refl : {g:ctx} (h:ctx) {$S:$[h |- g]} Howe_subst [g] $[h |- $S] $[h |- $S] =
 / trust /
 fun [] $[h |- ^] => HNil
   | [g, x:term _] $[h |- $S', M] => HCons (howe_subst_refl [g] $[h |- $S']) (howe_refl [h |- M])
 ;
-%{
+
+% ren is probably rename :)
 rec howe_ren : {g:ctx}{h:ctx}{$S: $[h |-# g]} Howe [|- T] [g |- M] [g |- N]
                -> Howe [|- T] [h |- M[$S]] [h |- N[$S]] =
 / total hr (howe_ren g h s t m n hr) /
@@ -263,9 +259,12 @@ mlam g, h, $S => fn hr => case hr of
 | Howe_case h1 h2 h3 s => Howe_case (howe_ren [g] [h] $[h |- $S] h1) (howe_ren [g] [h] $[h |- $S] h2)
                                     (howe_ren [g, x:term _, y:term _] [h, x:term _, y:term _] $[h, x:term _, y:term _ |- $S[..], x, y] h3)
                                     (osim_cus $[h |- $S] s)
+| Howe_pair h1 h2 s => Howe_pair (howe_ren [g] [h] $[h |- $S] h1) (howe_ren [g] [h] $[h |- $S] h2) (osim_cus $[h |- $S] s)
+| Howe_fst h' s => Howe_fst (howe_ren [g] [h] $[h |- $S] h') (osim_cus $[h |- $S] s)
+| Howe_snd h' s => Howe_snd (howe_ren [g] [h] $[h |- $S] h') (osim_cus $[h |- $S] s)
 ;
 
-%{
+
 rec howe_subst_wkn : (g:ctx) (h:ctx) {S:[|-tp]} Howe_subst [g] $[h |- $S1] $[h |- $S2]
                     -> Howe_subst [g] $[h, x:term S[] |- $S1[..]] $[h, x:term S[] |- $S2[..]] =
 / total hr (howe_subst_wkn g h s s1 s2 hr) /
@@ -274,7 +273,8 @@ rec howe_subst_wkn : (g:ctx) (h:ctx) {S:[|-tp]} Howe_subst [g] $[h |- $S1] $[h |
   | HCons hs' h' => HCons (howe_subst_wkn [|- S] hs') (howe_ren [_] [_, x:term S[]] $[_, x:term S[] |- ..] h')
 ;
 
-% this one I don't know how to make work
+
+% this one I don't know how to make work    <- this comment is from the repo we took it from!!! -L
 rec howe_subst_var : (g:ctx) (h:ctx) Howe [|- T] [g |- #p] [g |- M]
                      -> Howe_subst [g] $[h |- $S1] $[h |- $S2]
                      -> Howe [|- T] [h |- #p[$S1]] [h |- M[$S2]] =
@@ -303,6 +303,7 @@ case hs of
   %                     (osim_cus $[h |- $S2] s)
 ;
 
+
 rec howe_subst : (g:ctx) (h:ctx) Howe [|- T] [g |- M] [g |- N]
                  -> Howe_subst [g] $[h |- $S1] $[h |- $S2]
                  -> Howe [|- T] [h |- M[$S1]] [h |- N[$S2]] =
@@ -330,7 +331,12 @@ case ho of
                              (howe_refl [h, x:term _, y:term _ |- x]))
                           (howe_refl [h, x:term _, y:term _ |- y])))
                 (osim_cus $[h |- $S2] s)
+    | Howe_pair h1' h2' s => Howe_pair (howe_subst h1' hs) (howe_subst h2' hs) (osim_cus $[h |- $S2] s)
+    | Howe_fst h' s => Howe_fst  (howe_subst h' hs)  (osim_cus $[h |- $S2] s)
+    | Howe_snd h' s => Howe_snd  (howe_subst h' hs)  (osim_cus $[h |- $S2] s)
 ;
+
+%{
 
 % Datatype to pack an existential
 inductive Howe_abs : [x:term S |- term T[]] -> [|- term (arr S T)] -> ctype =
@@ -338,6 +344,7 @@ inductive Howe_abs : [x:term S |- term T[]] -> [|- term (arr S T)] -> ctype =
                -> ({R:[|- term S]} Howe [|- T][|- M' [R]] [|- N' [R]])
                -> Howe_abs [x:term S |- M'] [|- N]
 ;
+
 
 rec howe_ev_abs : Howe [ |- arr S T] [|- lam \x.M'] [|- N]
                   -> Howe_abs [x:term S |- M'] [|- N] =
@@ -389,6 +396,7 @@ fun [x:term S |- M] [x:term S |- N] s .Sim_lam (Ev_val Val_lam) => ESim_lam (Ev_
 ;
 
 
+%{
 inductive Aeq : [ |- term T] -> [ |- term T] -> ctype =
   | Refl: Aeq [ |- M] [ |- M];
 
