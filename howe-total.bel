@@ -427,8 +427,7 @@ fn e => case e of
   | Ev_case_snd Eval M  => ev_value M
 ;
 
-%{
-
+%%[PAIR] last 3 cases
 % This one required some work
 rec ev_det : Eval [ |- M] [ |- V1] -> Eval [|- M] [ |- V2] -> Aeq [|- V1] [ |- V2] =
     / total e (ev_det t m v1 v2 e) /
@@ -467,8 +466,24 @@ fn e1, e2 => case e1 of
      | Ev_case_cons [x:term _, y:term _ |- M] d1' d2' =>
        let Refl = ev_det d1 d1' in
        let Refl = ev_det d2 d2' in
-       Refl)
+       Refl
+      )
+  | Ev_val Val_pair =>
+    let Ev_val Val_pair = e2 in
+    Refl
+  | Ev_case_fst m n =>
+    let Ev_case_fst m' n' = e2 in
+    let Refl = ev_det m m' in
+    let Refl = ev_det n n' in
+    Refl
+  | Ev_case_snd m n =>
+    let Ev_case_snd m' n' = e2 in
+    let Refl = ev_det m m' in
+    let Refl = ev_det n n' in
+    Refl
 ;
+
+%{
 
 rec ev_val : Eval [ |- M] [ |- V] -> Eval [ |- V] [ |- V'] -> Aeq [ |- V] [ |- V'] =
 / total e (ev_val t m v e) /
