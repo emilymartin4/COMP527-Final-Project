@@ -17,7 +17,7 @@ LF term : tp -> type =
 | nil : term (list T)
 | cons : term T -> term (list T) -> term (list T)
 | lcase : term (list S) -> term T -> (term S -> term (list S) -> term T) -> term T
-| pair : term S -> term T -> term (cross S T) 
+| pair : term S -> term T -> term (cross S T)
 | fst : term (cross S T) -> term S
 | snd : term (cross S T) -> term T
 ;
@@ -233,7 +233,7 @@ inductive Howe_subst : {g:ctx} (h:ctx) {$S1 : $[h |- g]} {$S2 : $[h |- g]} ctype
   | HNil : Howe_subst [] $[h |- ^] $[h |- ^]
   | HCons : Howe_subst [g] $[h |- $S1] $[h |- $S2]
             -> Howe [|- T] [h |- M] [h |- N]
-            -> Howe_subst [g, x:term T[]] $[h |- $S1, M] $[h |- $S2, N] 
+            -> Howe_subst [g, x:term T[]] $[h |- $S1, M] $[h |- $S2, N]
 ;
 
 rec howe_subst_refl : {g:ctx} (h:ctx) {$S:$[h |- g]} Howe_subst [g] $[h |- $S] $[h |- $S] =
@@ -336,7 +336,6 @@ case ho of
     | Howe_snd h' s => Howe_snd  (howe_subst h' hs)  (osim_cus $[h |- $S2] s)
 ;
 
-%{
 
 % Datatype to pack an existential
 inductive Howe_abs : [x:term S |- term T[]] -> [|- term (arr S T)] -> ctype =
@@ -395,12 +394,27 @@ rec sim_lam : {M:[x:term S |- term T[]]}{N:[x:term S |- term T[]]}
 fun [x:term S |- M] [x:term S |- N] s .Sim_lam (Ev_val Val_lam) => ESim_lam (Ev_val Val_lam) s
 ;
 
+%%[PAIR] Next 2 definitions;
+% Datatype to pack an existential
+inductive Howe_pair' : [ |- term S] -> [ |- term T] -> [|- term (cross S T)] -> ctype =
+| Howe_pairC : Eval [ |- N] [|- pair H' L']
+              -> Howe [ |- S] [ |- H] [|- H']
+              -> Howe [|- T] [|- L] [|- L']
+              -> Howe_pair' [ |- H] [ |- L] [|- N]
+;
 
-%{
+rec howe_ev_pair : Howe [ |- cross S T] [ |- pair U V] [ |- N] -> Howe_pair' [|- U] [|- V] [|- N] =
+/ total h (howe_ev_pair t a l n h) /
+fun (Howe_pair h1 h2 (OSimC [_] s)) =>
+    let ESim_pair d s1 s2 = (s $[|- ^]) .Sim_pair (Ev_val Val_pair) in
+    Howe_pairC d (howe_osim_trans h1 (sim_osim s1)) (howe_osim_trans h2 (sim_osim s2))
+;
+
 inductive Aeq : [ |- term T] -> [ |- term T] -> ctype =
   | Refl: Aeq [ |- M] [ |- M];
 
 
+%%[PAIR] last 2 cases
 rec ev_value : Eval [|- M] [|- V] -> Value [|- V] =
 / total e (ev_value t m v e) /
 fn e => case e of
@@ -409,7 +423,11 @@ fn e => case e of
   | Ev_fix d => ev_value d
   | Ev_case_nil d d1 => ev_value d1
   | Ev_case_cons [h:term _ , t:term _ |- D] d1 d2 => ev_value d2
+  | Ev_case_fst Eval M  => ev_value M
+  | Ev_case_snd Eval M  => ev_value M
 ;
+
+%{
 
 % This one required some work
 rec ev_det : Eval [ |- M] [ |- V1] -> Eval [|- M] [ |- V2] -> Aeq [|- V1] [ |- V2] =
