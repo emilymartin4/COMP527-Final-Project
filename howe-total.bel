@@ -423,8 +423,8 @@ fn e => case e of
   | Ev_fix d => ev_value d
   | Ev_case_nil d d1 => ev_value d1
   | Ev_case_cons [h:term _ , t:term _ |- D] d1 d2 => ev_value d2
-  | Ev_case_fst Eval M  => ev_value M
-  | Ev_case_snd Eval M  => ev_value M
+  | Ev_case_fst m n  => ev_value n
+  | Ev_case_snd m n  => ev_value n
 ;
 
 %%[PAIR] last 3 cases
