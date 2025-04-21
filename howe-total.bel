@@ -483,7 +483,6 @@ fn e1, e2 => case e1 of
     Refl
 ;
 
-%{
 
 rec ev_val : Eval [ |- M] [ |- V] -> Eval [ |- V] [ |- V'] -> Aeq [ |- V] [ |- V'] =
 / total e (ev_val t m v e) /
@@ -556,6 +555,18 @@ fun d0 [x:term _, y:term _ |- N] .Sim_unit d =>
             (mlam R => sim_refl)
 ;
 
+%%? No good lol (signature cannot be right) -------------------------------------------------------
+% rec case_pair_sim : Eval [|- P] [|- pair F S] -> {N:[x:term A, y:term B |- term C[]]}
+                    % Sim  [|- C] [|- N[F, S]] [|- N[F, S]] =
+rec case_pair_sim : Eval [|- P] [|- P']
+                  -> Sim [|- T] [|- M] [|- N] =
+% / total e (case_pair_sim t s p h l n e) /
+% fun d s .Sim_pair e =>
+  % let ESim_pair d' s' = s .Sim_pair e in
+  ?
+;
+%%? -----------------------------------------------------------------------------------------------
+
 % this one gives weird error
 rec down_closed : Eval [|- M] [|- V] -> Howe [|- T] [|- M] [|- N] -> Howe [|- T] [|- V] [|- N] =
     / trust /
@@ -589,12 +600,21 @@ fn e => fn h => case e of
     howe_osim_trans (down_closed d2 h2) (osim_trans (sim_osim s') s)
   | (Ev_case_cons [x:term _ , y:term _ |- _] d1 d2) =>
     let (Howe_case h1 h2 h3 s) = h in
-    let Howe_consC d1' (h1':Howe [ |- T] [ |- M'] [ |- N'])
+    let Howe_consC (d1' : Eval [|- Q'] [|- cons N' NS']) (h1':Howe [ |- T] [ |- M'] [ |- N'])
                   (h2':Howe [ |- list T] [ |- MS'] [ |- NS'])
         = howe_ev_cons (down_closed d1 h1) in
     let s' = case_cons_sim d1' [x:term _, y:term (list _) |- _] in
     let h_hat = down_closed d2 (howe_subst h3 (HCons (HCons HNil h1') h2')) in
     howe_osim_trans h_hat (osim_trans (sim_osim s') s)
+  | (Ev_case_fst m n) =>
+    let (Howe_fst h1 h2) = h in
+    let Howe_pairC d1 h1' h2' % (h1' : Howe [|- T]  [|- M']  [|- N'])
+                      % (h2' : Howe [|- T'] [|- MS'] [|- NS'])
+        = howe_ev_pair (down_closed m h1) in
+    let q = down_closed n (howe_subst h1' HNil) in
+    % let w = case_pair_sim d1 in     %%? case_pair_sim signature is not good
+    howe_osim_trans q  % (osim_trans (sim_osim w) h2)
+                      ?
 ;
 
 rec howe_sim : Howe [|- T] [|- M] [|- N] -> Sim [|- T] [|- M] [|- N] =
@@ -605,6 +625,8 @@ fun h .Sim_unit e => howe_ev_unit (down_closed e h)
                          ESim_cons e' (howe_sim h1) (howe_sim h2)
   | h .Sim_lam e => let Howe_absC e' f = howe_ev_abs (down_closed e h) in
                         ESim_lam e' (mlam R => howe_sim (f [ |- R]))
+  | h .Sim_pair e => let Howe_pairC e' h1 h2 = howe_ev_pair (down_closed e h) in
+                        ESim_pair e' (howe_sim h1) (howe_sim h2)
 ;
 
 rec howe_osim : (g:ctx) Howe [|- T] [g |- E1] [g |- E2] -> OSim [|- T] [g |- E1] [g |- E2] =
@@ -612,6 +634,7 @@ rec howe_osim : (g:ctx) Howe [|- T] [g |- E1] [g |- E2] -> OSim [|- T] [g |- E1]
     fun h => OSimC [_] (mlam $S => howe_sim (howe_subst h (howe_subst_refl [_] $[|- $S])))
 ;
 
+%{
 
 
 %%%%%%%%%
