@@ -555,17 +555,19 @@ fun d0 [x:term _, y:term _ |- N] .Sim_unit d =>
             (mlam R => sim_refl)
 ;
 
-%%? No good lol (signature cannot be right) -------------------------------------------------------
-% rec case_pair_sim : Eval [|- P] [|- pair F S] -> {N:[x:term A, y:term B |- term C[]]}
-                    % Sim  [|- C] [|- N[F, S]] [|- N[F, S]] =
-rec case_pair_sim : Eval [|- P] [|- P']
-                  -> Sim [|- T] [|- M] [|- N] =
-% / total e (case_pair_sim t s p h l n e) /
-% fun d s .Sim_pair e =>
-  % let ESim_pair d' s' = s .Sim_pair e in
-  ?
+rec case_fst_sim : Eval [|- P] [|- pair F S]
+                  -> Sim [|- T] [|- F] [|- fst P] =
+/ total e (case_fst_sim t p m n e) /
+fun d0 .Sim_pair e =>
+  ESim_pair (Ev_case_fst d0 e) sim_refl sim_refl
 ;
-%%? -----------------------------------------------------------------------------------------------
+rec case_snd_sim : Eval [|- P] [|- pair F S]
+                  -> Sim [|- T] [|- S] [|- snd P] =
+/ total e (case_snd_sim t p m n e) /
+fun d0 .Sim_pair e =>
+  ESim_pair (Ev_case_snd d0 e) sim_refl sim_refl
+;
+
 
 % this one gives weird error
 rec down_closed : Eval [|- M] [|- V] -> Howe [|- T] [|- M] [|- N] -> Howe [|- T] [|- V] [|- N] =
@@ -611,10 +613,17 @@ fn e => fn h => case e of
     let Howe_pairC d1 h1' h2' % (h1' : Howe [|- T]  [|- M']  [|- N'])
                       % (h2' : Howe [|- T'] [|- MS'] [|- NS'])
         = howe_ev_pair (down_closed m h1) in
-    let q = down_closed n (howe_subst h1' HNil) in
-    % let w = case_pair_sim d1 in     %%? case_pair_sim signature is not good
-    howe_osim_trans q  % (osim_trans (sim_osim w) h2)
-                      ?
+    let q = down_closed n h1' in
+    let w = case_fst_sim d1 in
+    howe_osim_trans q (osim_trans (sim_osim w) h2)
+  | (Ev_case_snd m n) =>
+    let (Howe_snd h1 h2) = h in
+    let Howe_pairC d1 h1' h2' % (h1' : Howe [|- T]  [|- M']  [|- N'])
+                      % (h2' : Howe [|- T'] [|- MS'] [|- NS'])
+        = howe_ev_pair (down_closed m h1) in
+    let q = down_closed n h2' in
+    let w = case_snd_sim d1 in
+    howe_osim_trans q (osim_trans (sim_osim w) h2)
 ;
 
 rec howe_sim : Howe [|- T] [|- M] [|- N] -> Sim [|- T] [|- M] [|- N] =
@@ -676,6 +685,7 @@ rec sim_lemma2 : Sim [|- T] [|- app M N]
   | .Sim_unit d => ev1 d
   | .Sim_nil d => ev1 d
   | .Sim_cons d => ESim_cons (ev1 d) sim_refl sim_refl
+  | .Sim_pair d => ESim_pair (ev1 d) sim_refl sim_refl
 ;
 
 rec sim_lemma1: {M:[|- term _]}
